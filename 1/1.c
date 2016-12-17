@@ -3,30 +3,56 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ID "id"
+#define NUM "num"
+#define CH "ch"
+#define STR "str"
+#define KW_INT "kw_int"
+#define KW_CHAR "kw_char"
+#define KW_VOID "kw_void"
+#define KW_IF "kw_if"
+#define KW_ELSE "kw_else"
+#define KW_SWITCH "kw_switch"
+#define KW_CASE "kw_case"
+#define KW_DEFAULT "kw_default"
+#define KW_WHILE "kw_while"
+#define KW_DO "kw_do"
+#define KW_FOR "kw_for"
+#define KW_BREAK "kw_break"
+#define KW_CONTINUE "kw_continue"
+#define KW_RETURN "kw_return"
+#define ADD "add"
+#define SUB "sub"
+#define MUL "mul"
+#define DIV "div"
+#define MOD "mod"
+#define INC "inc"
+#define DEC "dec"
+#define NOT "not"
+#define AND "and"
+#define OR "or"
+#define ASSIGN "assign"
+#define GT "gt"
+#define GE "ge"
+#define LT "lt"
+#define LE "le"
+#define EQU "equ"
+#define NEQU "nequ"
+#define COMMA "comma"
+#define COLON "colon"
+#define SIMCON "simcom"
+#define LPAREN "lparen"
+#define RPAREN "rparen"
+#define LBRAC "lbrac"
+#define RBRAC "rbrac"
+
 char current[1];
 char token[10];
 char *text;
+char *symbol;
 char *reserver_list[50];
 int cur_point;
 int buffer_len = 0;
-
-void initReserverList() {
-    reserver_list[0] = "const";
-    reserver_list[1] = "int";
-    reserver_list[2] = "char";
-    reserver_list[3] = "void";
-    reserver_list[4] = "if";
-    reserver_list[5] = "else";
-    reserver_list[6] = "switch";
-    reserver_list[7] = "case";
-    reserver_list[8] = "default";
-    reserver_list[9] = "while";
-    reserver_list[10] = "do";
-    reserver_list[11] = "for";
-    reserver_list[12] = "break";
-    reserver_list[13] = "continue";
-    reserver_list[14] = "return";
-}
 
 void clearToken() {
     strcpy(token, "\0");
@@ -216,6 +242,38 @@ bool isRbrace() {
     }
 }
 
+bool isSQuotation() {
+    if (text[cur_point] == '\'') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool isDQuotation() {
+    if (text[cur_point] == '"') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool isODigit() {
+    if (text[cur_point] >= '0' && text[cur_point] <= '7') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool isHDigit() {
+    if ((text[cur_point] >= '0' && text[cur_point] <= '9') || (text[cur_point] >= 'a' && text[cur_point] <= 'f') || (text[cur_point] >= 'A' && text[cur_point] <= 'F')) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void _getchar() {
     if (cur_point < buffer_len) {
         cur_point++;
@@ -254,16 +312,49 @@ void retract() {
     }
 }
 
-int reserver() {
-    for (size_t i = 0; i < 15; i++) {
-        if (strcmp(token, reserver_list[i])) {
-            return 0;
-        }
+void reserver() {
+    if (strcmp(token, "int") == 0) {
+        symbol = KW_INT;
+    } else if (strcmp(token, "char") == 0) {
+        symbol = KW_CHAR;
+    } else if (strcmp(token, "void") == 0) {
+        symbol = KW_VOID;
+    } else if (strcmp(token, "if") == 0) {
+        symbol = KW_IF;
+    } else if (strcmp(token, "else") == 0) {
+        symbol = KW_ELSE;
+    } else if (strcmp(token, "switch") == 0) {
+        symbol = KW_SWITCH;
+    } else if (strcmp(token, "case") == 0) {
+        symbol = KW_CASE;
+    } else if (strcmp(token, "default") == 0) {
+        symbol = KW_DEFAULT;
+    } else if (strcmp(token, "while") == 0) {
+        symbol = KW_WHILE;
+    } else if (strcmp(token, "do") == 0) {
+        symbol = KW_DO;
+    } else if (strcmp(token, "for") == 0) {
+        symbol = KW_FOR;
+    } else if (strcmp(token, "break") == 0) {
+        symbol = KW_BREAK;
+    } else if (strcmp(token, "continue") == 0) {
+        symbol = KW_CONTINUE;
+    } else if (strcmp(token, "return") == 0) {
+        symbol = KW_RETURN;
+    } else {
+        symbol = "id";
     }
-    return 1;
 }
 
-int transNum() {
+int transONum() {
+    int num = 0;
+    for (int i = 0; token[i] != '\0'; i++) {
+        num = num * 8 + (token[i] - '0');
+    }
+    return num;
+}
+
+int transDNum() {
     int num = 0;
     for (int i = 0; token[i] != '\0'; i++) {
         num = num * 10 + (token[i] - '0');
@@ -271,17 +362,23 @@ int transNum() {
     return num;
 }
 
+int transHNum() {
+    int num = 0;
+    for (int i = 0; token[i] != '\0'; i++) {
+        if (token[i] >= '0' && token[i] <= '9') {
+            num = num * 16 + (token[i] - '0');
+        } else if (token[i] >= 'a' && token[i] <= 'f') {
+            num = num * 16 + (token[i] - 'a' + 10);
+        } else if (token[i] >= 'A' && token[i] <= 'F') {
+            num = num * 16 + (token[i] - 'A' + 10);
+        }
+    }
+    return num;
+}
+
 void error() {
     printf("The current character %c cannot be recognized.\n", text[cur_point]);
 }
-
-/*---------------------------------------
-    0 - 关键字和保留字
-    1 - 常量（数字，字符，字符串）
-    2 - 单目运算符
-    3 - 双目运算符
-    4 - 分解符
----------------------------------------*/
 
 int getsym() {
 
@@ -298,116 +395,184 @@ int getsym() {
             _getchar();
         }
         retract();
-        printf("%d\t:\t%s\n", reserver(), token);
+        reserver();
+        printf("%-10s\t:\t%s\n", symbol, token);
     } else if (isDigit()) {
 
-        while (isDigit()) {
+        int num = 0;
+        if (text[cur_point] == '0') {
+            _getchar();
+            if (text[cur_point] == 'x' || text[cur_point] == 'X') {
+                _getchar();
+                while (isHDigit()) {
+                    catToken();
+                    _getchar();
+                }
+                num = transHNum();
+            } else {
+                while (isODigit()) {
+                    catToken();
+                    _getchar();
+                }
+                num = transONum();
+            }
+        } else {
+            while (isDigit()) {
+                catToken();
+                _getchar();
+            }
+            num = transDNum();
+        }
+
+        retract();
+        symbol = NUM;
+        printf("%-10s\t:\t%d\n", symbol, num);
+
+    } else if (isDQuotation()) {
+
+        _getchar();
+        while (!isDQuotation()) {
             catToken();
             _getchar();
         }
-        retract();
-        int num = transNum();            // 把token中的字符串换成整数
-        printf("1\t:\t%d\n", num);
+        symbol = STR;
+        printf("%-10s\t:\t%s\n", symbol, token);
+    } else if (isSQuotation()) {
 
+        _getchar();
+        symbol = CH;
+        printf("%-10s\t:\t%c\n", symbol, text[cur_point]);
+        _getchar();
     } else if (isAdd()) {
 
         _getchar();
         if (isAdd()) {
-            printf("3\t:\t%s\n", "++");
+            symbol = INC;
+            printf("%-10s\t:\t%s\n", symbol, "++");
         } else {
-            printf("2\t:\t%c\n", '+');
+            symbol = ADD;
+            printf("%-10s\t:\t%c\n", symbol, '+');
             retract();
         }
     } else if (isSub()) {
 
         _getchar();
         if (isSub()) {
-            printf("3\t:\t%s\n", "--");
+            symbol = DEC;
+            printf("%-10s\t:\t%s\n", symbol, "--");
         } else {
-            printf("2\t:\t%c\n", '-');
+            symbol = SUB;
+            printf("%-10s\t:\t%c\n", symbol, '-');
             retract();
         }
     } else if (isAnd()) {
 
         _getchar();
         if (isAnd()) {
-            printf("3\t:\t%s\n", "&&");
+            symbol = AND;
+            printf("%-10s\t:\t%s\n", symbol, "&&");
         } else {
-            printf("2\t:\t%c\n", '&');
+            symbol = "d_and";
+            printf("%-10s\t:\t%c\n", symbol, '&');
             retract();
         }
     } else if (isOr()) {
 
         _getchar();
         if (isOr()) {
-            printf("3\t:\t%s\n", "||");
+            symbol = OR;
+            printf("%-10s\t:\t%s\n", symbol, "||");
         } else {
-            printf("2\t:\t%c\n", '|');
+            symbol = "d_or";
+            printf("%-10s\t:\t%c\n", symbol, '|');
             retract();
         }
     } else if (isNot()) {
 
         _getchar();
         if (isAssign()) {
-            printf("3\t:\t%s\n", "!=");
+            symbol = NEQU;
+            printf("%-10s\t:\t%s\n", symbol, "!=");
         } else {
-            printf("2\t:\t%c\n", '!');
+            symbol = NOT;
+            printf("%-10s\t:\t%c\n", symbol, '!');
             retract();
         }
     } else if (isGt()) {
 
         _getchar();
         if (isAssign()) {
-            printf("3\t:\t%s\n", ">=");
+            symbol = GE;
+            printf("%-10s\t:\t%s\n", symbol, ">=");
         } else {
-            printf("2\t:\t%c\n", '>');
+            symbol = GT;
+            printf("%-10s\t:\t%c\n", symbol, '>');
             retract();
         }
     } else if (isLt()) {
 
         _getchar();
         if (isAssign()) {
-            printf("3\t:\t%s\n", "<=");
+            symbol = LE;
+            printf("%-10s\t:\t%s\n", symbol, "<=");
         } else {
-            printf("2\t:\t%c\n", '<');
+            symbol = LT;
+            printf("%-10s\t:\t%c\n", symbol, '<');
             retract();
         }
     } else if (isAssign()) {
 
         _getchar();
         if (isAssign()) {
-            printf("3\t:\t%s\n", "==");
+            symbol = EQU;
+            printf("%-10s\t:\t%s\n", symbol, "==");
         } else {
-            printf("2\t:\t%c\n", '=');
+            symbol = ASSIGN;
+            printf("%-10s\t:\t%c\n", symbol, '=');
             retract();
         }
     } else if (isDiv()) {
 
         _getchar();
-        if (isDiv()) {
-            printf("3\t:\t%s\n", "//");
+        if (isMul()) {                           // 处理/**/注释
+            while (!isDiv()) {
+                while (!isMul()) {
+                    _getchar();
+                }
+                _getchar();
+            }
         } else {
-            printf("2\t:\t%c\n", '/');
+            symbol = DIV;
+            printf("%-10s\t:\t%c\n", symbol, '/');
             retract();
         }
     } else if (isMul()) {
-        printf("2\t:\t%c\n", '*');
+        symbol = MUL;
+        printf("%-10s\t:\t%c\n", symbol, '*');
     } else if (isMod()) {
-        printf("2\t:\t%c\n", '%');
+        symbol = MOD;
+        printf("%-10s\t:\t%c\n", symbol, '%');
     } else if (isComma()) {
-        printf("4\t:\t%c\n", ',');
+        symbol = COMMA;
+        printf("%-10s\t:\t%c\n", symbol, ',');
     } else if (isColon()) {
-        printf("4\t:\t%c\n", ':');
+        symbol = COLON;
+        printf("%-10s\t:\t%c\n", symbol, ':');
     } else if (isSemicolon()) {
-        printf("4\t:\t%c\n", ';');
+        symbol = SIMCON;
+        printf("%-10s\t:\t%c\n", symbol, ';');
     } else if (isLparen()) {
-        printf("4\t:\t%c\n", '(');
+        symbol = LPAREN;
+        printf("%-10s\t:\t%c\n", symbol, '(');
     } else if (isRparen()) {
-        printf("4\t:\t%c\n", ')');
+        symbol = RPAREN;
+        printf("%-10s\t:\t%c\n", symbol, ')');
     } else if (isLbrace()) {
-        printf("4\t:\t%c\n", '{');
+        symbol = LBRAC;
+        printf("%-10s\t:\t%c\n", symbol, '{');
     } else if (isRbrace()) {
-        printf("4\t:\t%c\n", '}');
+        symbol = RBRAC;
+        printf("%-10s\t:\t%c\n", symbol, '}');
     } else {
         error();
     }
@@ -416,9 +581,8 @@ int getsym() {
 }
 
 int main(void) {
-    initReserverList();
     readIn();
-    
+
     for (cur_point =0; text[cur_point] != '\0'; cur_point++) {
         getsym();
     }

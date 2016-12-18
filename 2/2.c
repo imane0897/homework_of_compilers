@@ -4,8 +4,8 @@
 #include <math.h>
 #include <time.h>
 
-typedef char STATUS;
-typedef int CONDITION;
+typedef int STATUS;
+typedef char CONDITION;
 
 typedef struct trans {
     STATUS origin;
@@ -35,17 +35,13 @@ trans *read(FILE *src) {
         }
         // get data
         trans *current = d + i;
-        fscanf(src, "%c", &ch);
-        fscanf(src,"%c %d %c", &current->origin, &current->condition, &current->des);
+        fscanf(src,"%d%c%d", &current->origin, &current->condition, &current->des);
     }
-    fscanf(src, "%c", &ch);
-    fscanf(src, "%c", &start);
-    fscanf(src, "%c", &ch);
+
     fscanf(src, "%d", &k);
     acc = (STATUS *)realloc(acc, k*sizeof(STATUS));
     for (int j = 0; j < k; j++) {
-        fscanf(src, "%c", &ch);
-        fscanf(src, "%c", acc+j);
+        fscanf(src, "%d", acc+j);
     }
     return d;
 }
@@ -65,27 +61,6 @@ void trans_status(trans *d, STATUS origin, STATUS des) {
     }
 }
 
-void rearrange(trans *d, int count){
-    trans temp;
-    for (int i = 0; i < m; i++) {
-        if (d[i].condition == -1) {
-            printf("current i is %d %d\n", i, d[i].condition);
-            temp.origin = d[i].origin;
-            temp.condition = d[i].condition;
-            temp.des = d[i].des;
-            for (int j = i+1; j < n; j++) {
-                d[j-1].origin = d[j].origin;
-                d[j-1].condition = d[j].condition;
-                d[j-1].des = d[j].des;
-            }
-            d[n-1].origin = temp.origin;
-            d[n-1].condition = temp.condition;
-            d[n-1].des = temp.des;
-        }
-    }
-    m -= count;
-}
-
 int cmp(const void *a, const void *b) {
     trans *aa = (trans *)a;
     trans *bb = (trans *)b;
@@ -101,7 +76,7 @@ int cmp(const void *a, const void *b) {
 void determine(trans *d) {
     int count = 0;
     for (int i = 0; i < m; i++) {
-        if (d[i].condition == -1) {
+        if (d[i].condition == '#') {
             trans_status(d, d[i].origin, d[i].des);
             count++;
         }
@@ -121,15 +96,50 @@ void determine(trans *d) {
     }
 }
 
+int isNFA(trans *d) {
+
+    qsort(d, m, sizeof(d[0]), cmp);
+    for (int i = 0; i < m; i++) {
+        if (d[i].condition == '#') {
+            return 1;
+        }
+        for (int j = i + 1; j < m; j++) {
+            if (d[i].origin == d[j].origin) {
+                if (d[i].condition == d[j].condition) {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+bool isAcc(STATUS statu) {
+    for (int i = 0; i < k; i++) {
+        if (acc[i] == statu) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void minimize(trans *d) {
+    
+}
+
 int main(void) {
     FILE *automaton;
     automaton = fopen("./automaton", "r");
 
     trans *d = read(automaton);
 
-    determine(d);
+    if (isNFA(d)) {
+        determine(d);
+    }
+
+    minimize(d);
     for (int i = 0; i < m; i++) {
-        printf("%c %d %c\n", d[i].origin, d[i].condition, d[i].des);
+        printf("%d %c %d\n", d[i].origin, d[i].condition, d[i].des);
     }
     return 0;
 }

@@ -4,8 +4,20 @@ dic = {}
 new_dic = {}
 
 def fname():
+    dic_list = list(dic.keys())
+    for l, d in enumerate(dic_list):
+        print('current d is ', d)
 
-    for d in dic:
+        for p in dic_list[:l]:
+            for v, s in enumerate(dic[str(d)]):
+                if s[0] == str(p):
+                    print (dic[str(p)][0])
+                    dic[str(d)][v] = dic[str(p)][0]
+                    for t in dic[str(p)][1:]:
+                        dic[str(d)].append(t)
+                else:
+                    pass
+
         flag = 0
         for i, s in enumerate(dic[str(d)]):
             if s[0] == str(d)[0]:
@@ -22,22 +34,26 @@ def fname():
             n = len(dic[str(d)])
             n = int(n)
             i = int(i)
-            # print(n)
             k=0
             while i < n :
-                print(dic[str(d)][k])
                 if dic[str(d)][k][0] == str(d)[0]:
                     dic[str(d)].pop(i)
                     new_dic[temp].append(s[1:]+temp)
                     k=k-1
                 else:
                     dic[str(d)][k]=dic[str(d)][k]+temp
-                    new_dic[temp].append('#')
+                    flag2 = 0;
+                    for b in new_dic[temp]:
+                        if b == '#':
+                            flag2 = 1;
+                    if flag2 == 0:
+                        new_dic[temp].append('#')
+                    else:
+                        pass
                     k=k+1
                 i = i+1
 
-        else:
-            pass
+
 
 def merge():
     for d in new_dic:
@@ -54,23 +70,14 @@ def my_print():
         print(temp)
 
 if __name__=='__main__':
-    n = input()
-    n = int(n)
-    while n > 0:
-        temp = input()
-        s = temp[4:]
-        if temp[0] in dic:
-            dic[temp[0]].append(s)
-        else:
-            dic[temp[0]] = [s]
-        n = n - 1
-    # dic={'E':['E+T', 'T'], 'T':['T*F', 'F'], 'F':['(F)', 'i']}
-    # print(dic)
+    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3.txt', 'r') as f:
+        for line in f.readlines():
+            if line[0] in dic:
+
+                dic[line[0]].append(line[4:-1])
+            else:
+                dic[line[0]] = [line[4:-1]]
+
     fname()
-    # print(new)
-    print(dic)
-    print(' ')
-    print(new_dic)
     merge()
-    print(' ')
     my_print()

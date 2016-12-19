@@ -23,7 +23,7 @@ trans *read(FILE *src) {
     if (!src) return NULL;  // file read error
     trans *d = NULL;
     int dataset_size = 0;
-    char ch;
+
     fscanf(src, "%d %d", &n, &m);
     for (int i = 0; i < m; i++) {
         if (dataset_size == i) {
@@ -124,7 +124,7 @@ bool isAcc(STATUS statu) {
 }
 
 void minimize(trans *d) {
-    
+
 }
 
 int main(void) {

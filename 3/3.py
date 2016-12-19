@@ -1,7 +1,6 @@
 import sys
 
 def remove(dic):
-    new_dic = {}
     dic_list = list(dic.keys())
     for i, form_left in enumerate(dic_list):
 
@@ -18,42 +17,30 @@ def remove(dic):
         for i, form_right in enumerate(dic[str(form_left)]):
             if form_right[0] == str(form_left)[0]:
                 temp = form_right[0]+'\''
-                new_dic[temp] = []
+                dic[temp] = []
                 flag = 1
                 break
 
         if flag == 1:
-            i = 0
-            n = len(dic[str(form_left)])
-            n = int(n)
-            i = int(i)
-            k = 0
+            n = int(len(dic[str(form_left)]))
+            index = 0
             while i < n :
-                if dic[str(form_left)][k][0] == str(form_left)[0]:
+                if dic[str(form_left)][index][0] == str(form_left)[0]:
                     dic[str(form_left)].pop(i)
-                    new_dic[temp].append(form_right[1:]+temp)
-                    k=k-1
+                    dic[temp].append(form_right[1:]+temp)
+                    index -= 1
                 else:
-                    dic[str(form_left)][k]=dic[str(form_left)][k]+temp
+                    dic[str(form_left)][index]=dic[str(form_left)][index]+temp
                     flag2 = 0;
-                    for b in new_dic[temp]:
+                    for b in dic[temp]:
                         if b == '#':
                             flag2 = 1;
                     if flag2 == 0:
-                        new_dic[temp].append('#')
+                        dic[temp].append('#')
                     else:
                         pass
-                    k=k+1
-                i = i+1
-    dic_merge(dic, new_dic)
-
-
-
-def dic_merge(dic, new_dic):
-    for d in new_dic:
-        dic[str(d)] = []
-        for s in new_dic[str(d)]:
-            dic[str(d)].append(s)
+                    index += 1
+                i += 1
 
 
 def print_forms(dic):

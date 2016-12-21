@@ -1,9 +1,11 @@
 import sys
+import collections
 
 def remove(dic):
     dic_list = list(dic.keys())
     for i, form_left in enumerate(dic_list):
 
+        # 代入消除间接左递归
         for j in dic_list[:i]:
             for index, form_right in enumerate(dic[str(form_left)]):
                 if form_right[0] == str(j):
@@ -13,6 +15,7 @@ def remove(dic):
                 else:
                     pass
 
+        # 消除直接左递归
         flag = 0
         for i, form_right in enumerate(dic[str(form_left)]):
             if form_right[0] == str(form_left)[0]:
@@ -51,14 +54,98 @@ def print_forms(dic):
         temp = temp + dic[str(d)][-1]
         print(temp)
 
+def nextsym():
+    pass
+
+def error():
+    print('illegal')
+
+def F(str, i):
+    if str[i] == '(':
+        # nextsym()
+        i += 1
+        if E(str, i):
+            if str[i] == ')':
+                nextsym()
+            else:
+                error()
+                return False
+        else:
+            return False
+    else:
+        if str[i] == 'i':
+            # nextsym()
+            i += 1
+        else:
+            error()
+            return False
+    return True
+
+def E(str, i):
+    if T(str, i):
+        if _E(str, i):
+            return True
+        else:
+            return False
+    else:
+        error()
+        return False
+    # nextsym()
+    i += 1
+    return True
+
+def _E(str, i):
+    if str[i] == '+':
+        # nextsym()
+        i += 1
+        if F(str, i):
+            if _T(str, i):
+                i += 1
+                return True
+            else:
+                return False
+        else:
+            return False
+        # nextsym()
+        i += 1
+    else:
+        return False
+
+def T():
+    F()
+    _T()
+    nextsym()
+
+def _T():
+    if SYM == '*':
+        F()
+        _T()
+    else:
+        nextsym()
+
 
 if __name__=='__main__':
-    dic = {}
-    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3.txt', 'r') as f:
-        for line in f.readlines():
+    dic = collections.OrderedDict()
+    # dic = {}
+    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_1.txt', 'r') as f1:
+        l = f1.readlines()
+        for line in l:
             if line[0] in dic:
                 dic[line[0]].append(line[4:-1])
             else:
                 dic[line[0]] = [line[4:-1]]
+        print(dic)
+
+    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
+        str = f2.read()
+
     remove(dic)
+    sym = iter(str)
+    try:
+        while True:
+            print(sym)
+
+    except StopIteration:
+        pass
+
     print_forms(dic)

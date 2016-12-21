@@ -1,4 +1,3 @@
-import sys
 import collections
 
 def remove(dic):
@@ -54,98 +53,113 @@ def print_forms(dic):
         temp = temp + dic[str(d)][-1]
         print(temp)
 
-def nextsym():
-    pass
-
-def error():
-    print('illegal')
-
-def F(str, i):
-    if str[i] == '(':
-        # nextsym()
+def F(sym, i):
+    if sym[i] == '(':
         i += 1
-        if E(str, i):
-            if str[i] == ')':
-                nextsym()
+        if E(sym, i):
+            if sym == ')':
+                pass
             else:
-                error()
                 return False
         else:
             return False
+    elif sym[i] == 'i':
+        print('mmm')
+        pass
     else:
-        if str[i] == 'i':
-            # nextsym()
-            i += 1
-        else:
-            error()
-            return False
+        return False
+    i += 1
+    print('lll')
     return True
 
-def E(str, i):
-    if T(str, i):
-        if _E(str, i):
+def E(sym, i):
+    if T(sym, i):
+        if _E(sym, i):
+            i += 1
             return True
         else:
             return False
     else:
-        error()
         return False
-    # nextsym()
     i += 1
     return True
 
-def _E(str, i):
-    if str[i] == '+':
-        # nextsym()
+def _E(sym, i):
+    if sym[i] == '+':
         i += 1
-        if F(str, i):
-            if _T(str, i):
+        if _T(sym, i):
+            if _E(sym, i):
                 i += 1
                 return True
             else:
                 return False
         else:
             return False
-        # nextsym()
+    else:
         i += 1
+        return True
+
+def T(sym, i):
+    if F(sym, i):
+        i += 1
+        if _T(sym, i):
+            return True
+        else:
+            return False
     else:
         return False
 
-def T():
-    F()
-    _T()
-    nextsym()
-
-def _T():
-    if SYM == '*':
-        F()
-        _T()
+def _T(sym, i):
+    if sym[i] == '*':
+        i += 1
+        if F(sym, i):
+            if _T(sym, i):
+                i += 1
+                return True
+            else:
+                return False
+        else:
+            return False
     else:
-        nextsym()
-
+        return False
 
 if __name__=='__main__':
     dic = collections.OrderedDict()
-    # dic = {}
     with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_1.txt', 'r') as f1:
         l = f1.readlines()
-        for line in l:
-            if line[0] in dic:
-                dic[line[0]].append(line[4:-1])
-            else:
-                dic[line[0]] = [line[4:-1]]
-        print(dic)
 
-    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
-        str = f2.read()
+    for line in l:
+        if line[0] in dic:
+            dic[line[0]].append(line[4:-1])
+        else:
+            dic[line[0]] = [line[4:-1]]
 
     remove(dic)
-    sym = iter(str)
-    try:
-        while True:
-            print(sym)
-
-    except StopIteration:
-        pass
-
     print_forms(dic)
+    print('')
+
+    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
+        test_string = f2.read()
+        # print(test_strings)
+
+    # for test_string in test_strings:
+    #     sym = list(test_string.strip())
+    #     print(sym)
+
+    sym = list(test_string.strip())
+    print(sym)
+    i = 0
+    while i < len(sym):
+        if E(sym, i):
+            print('legal')
+            continue
+        elif T(sym, i):
+            print('legal')
+            continue
+        elif F(sym, i):
+            print('legal')
+            continue
+        else:
+            print(i, 'illegal')
+            break
+        i += 1

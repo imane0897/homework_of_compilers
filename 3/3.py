@@ -1,5 +1,7 @@
 import collections
 
+flag = 0
+
 def remove(dic):
     dic_list = list(dic.keys())
     for i, form_left in enumerate(dic_list):
@@ -53,74 +55,88 @@ def print_forms(dic):
         temp = temp + dic[str(d)][-1]
         print(temp)
 
-def F(sym, i):
-    if sym[i] == '(':
-        i += 1
-        if E(sym, i):
+def error():
+    flag = 0
+
+def F(sym):
+    if sym == '(':
+        next(sym)
+        if E(sym):
             if sym == ')':
                 pass
             else:
+                error()
                 return False
         else:
+            error()
             return False
-    elif sym[i] == 'i':
-        print('mmm')
+    elif sym == 'i':
+        print('x')
         pass
     else:
+        error()
         return False
-    i += 1
-    print('lll')
+    next(sym)
     return True
 
-def E(sym, i):
-    if T(sym, i):
-        if _E(sym, i):
-            i += 1
+def E(sym):
+    if T(sym):
+        if _E(sym):
+            # i += 1
+            next(sym)
             return True
         else:
+            error()
             return False
     else:
+        error()
         return False
-    i += 1
+    next(sym)
     return True
 
-def _E(sym, i):
-    if sym[i] == '+':
-        i += 1
-        if _T(sym, i):
-            if _E(sym, i):
-                i += 1
+def _E(sym):
+    if sym == '+':
+        next(sym)
+        if _T(sym):
+            if _E(sym):
+                next(sym)
                 return True
             else:
+                error()
                 return False
         else:
+            error()
             return False
     else:
-        i += 1
+        next(sym)
         return True
 
-def T(sym, i):
-    if F(sym, i):
-        i += 1
-        if _T(sym, i):
+def T(sym):
+    if F(sym):
+        next(sym)
+        if _T(sym):
             return True
         else:
+            error()
             return False
     else:
         return False
 
-def _T(sym, i):
-    if sym[i] == '*':
-        i += 1
-        if F(sym, i):
-            if _T(sym, i):
-                i += 1
+def _T(sym):
+    if sym == '*':
+        next(sym)
+        if F(sym):
+            if _T(sym):
+                next(sym)
                 return True
             else:
+                error()
                 return False
         else:
+            error()
             return False
     else:
+        error()
         return False
 
 if __name__=='__main__':
@@ -146,20 +162,17 @@ if __name__=='__main__':
     #     sym = list(test_string.strip())
     #     print(sym)
 
-    sym = list(test_string.strip())
-    print(sym)
-    i = 0
-    while i < len(sym):
-        if E(sym, i):
-            print('legal')
-            continue
-        elif T(sym, i):
-            print('legal')
-            continue
-        elif F(sym, i):
-            print('legal')
+    sym = iter(test_string.strip())
+    flag = 1
+
+    while True:
+        if F(sym):
             continue
         else:
-            print(i, 'illegal')
+            flag = 0
             break
-        i += 1
+
+    if flag == 0:
+        print('illegal')
+    else:
+        print('legal')

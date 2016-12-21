@@ -53,15 +53,23 @@ def print_forms(dic):
         temp = temp + dic[str(d)][-1]
         print(temp)
 
-flag = 0
+def nextsym():
+    global i
+    global sym
+    if i < len(symbol)-1:
+        i += 1
+        sym = symbol[i]
+    else:
+        sym = '#'
 
 def error():
+    global flag
     flag = 0
 
-def F(sym, i):
-    if sym[i] == '(':
-        i += 1
-        if E(sym, i):
+def F():
+    if sym == '(':
+        nextsym()
+        if E():
             if sym == ')':
                 pass
             else:
@@ -70,20 +78,17 @@ def F(sym, i):
         else:
             error()
             return False
-    elif sym[i] == 'i':
-        # print('mmm')
+    elif sym == 'i':
         pass
     else:
         error()
         return False
-    i += 1
-    # print('lll')
+    nextsym()
     return True
 
-def E(sym, i):
-    if T(sym, i):
-        if _E(sym, i):
-            i += 1
+def E():
+    if T():
+        if _E():
             return True
         else:
             error()
@@ -91,15 +96,13 @@ def E(sym, i):
     else:
         error()
         return False
-    i += 1
     return True
 
-def _E(sym, i):
-    if sym[i] == '+':
-        i += 1
-        if _T(sym, i):
-            if _E(sym, i):
-                i += 1
+def _E():
+    if sym == '+':
+        nextsym()
+        if T():
+            if _E():
                 return True
             else:
                 error()
@@ -108,13 +111,11 @@ def _E(sym, i):
             error()
             return False
     else:
-        i += 1
         return True
 
-def T(sym, i):
-    if F(sym, i):
-        i += 1
-        if _T(sym, i):
+def T():
+    if F():
+        if _T():
             return True
         else:
             error()
@@ -123,12 +124,11 @@ def T(sym, i):
         error()
         return False
 
-def _T(sym, i):
-    if sym[i] == '*':
-        i += 1
-        if F(sym, i):
-            if _T(sym, i):
-                i += 1
+def _T():
+    if sym == '*':
+        nextsym()
+        if F():
+            if _T():
                 return True
             else:
                 error()
@@ -137,8 +137,7 @@ def _T(sym, i):
             error()
             return False
     else:
-        error()
-        return False
+        return True
 
 if __name__=='__main__':
     dic = collections.OrderedDict()
@@ -155,27 +154,35 @@ if __name__=='__main__':
     print_forms(dic)
     print('')
 
+    global symbol
+    global sym
+    global i
+    global flag
+
     with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
-        test_string = f2.read()
-        # print(test_strings)
+        l = f2.readlines()
 
-    # for test_string in test_strings:
-    #     sym = list(test_string.strip())
-    #     print(sym)
+        for test_string in l:
+            symbol = list(test_string.strip())
+            i = -1
+            flag = 1
+            nextsym()
 
-    sym = list(test_string.strip())
-    # print(sym)
-    i = 0
-    flag = 1
-    while i < len(sym):
-        if F(sym, i):
-            continue
-        else:
-            flag = 0
-            break
-        i += 1
+            while (sym != '#') and (flag == 1):
+                if (sym == 'i') or (sym == '(') or (sym ==')'):
+                    F()
+                    continue
+                elif sym == '*':
+                    _T()
+                    continue
+                elif sym == '+':
+                    _E()
+                    continue
+                else:
+                    flag = 0
+                    break
 
-    if flag == 1:
-        print('legal')
-    else:
-        print('illegal')
+            if flag == 1:
+                print('legal')
+            else:
+                print('illegal')

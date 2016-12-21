@@ -53,6 +53,11 @@ def print_forms(dic):
         temp = temp + dic[str(d)][-1]
         print(temp)
 
+flag = 0
+
+def error():
+    flag = 0
+
 def F(sym, i):
     if sym[i] == '(':
         i += 1
@@ -60,16 +65,19 @@ def F(sym, i):
             if sym == ')':
                 pass
             else:
+                error()
                 return False
         else:
+            error()
             return False
     elif sym[i] == 'i':
-        print('mmm')
+        # print('mmm')
         pass
     else:
+        error()
         return False
     i += 1
-    print('lll')
+    # print('lll')
     return True
 
 def E(sym, i):
@@ -78,8 +86,10 @@ def E(sym, i):
             i += 1
             return True
         else:
+            error()
             return False
     else:
+        error()
         return False
     i += 1
     return True
@@ -92,8 +102,10 @@ def _E(sym, i):
                 i += 1
                 return True
             else:
+                error()
                 return False
         else:
+            error()
             return False
     else:
         i += 1
@@ -105,8 +117,10 @@ def T(sym, i):
         if _T(sym, i):
             return True
         else:
+            error()
             return False
     else:
+        error()
         return False
 
 def _T(sym, i):
@@ -117,10 +131,13 @@ def _T(sym, i):
                 i += 1
                 return True
             else:
+                error()
                 return False
         else:
+            error()
             return False
     else:
+        error()
         return False
 
 if __name__=='__main__':
@@ -147,19 +164,18 @@ if __name__=='__main__':
     #     print(sym)
 
     sym = list(test_string.strip())
-    print(sym)
+    # print(sym)
     i = 0
+    flag = 1
     while i < len(sym):
-        if E(sym, i):
-            print('legal')
-            continue
-        elif T(sym, i):
-            print('legal')
-            continue
-        elif F(sym, i):
-            print('legal')
+        if F(sym, i):
             continue
         else:
-            print(i, 'illegal')
+            flag = 0
             break
         i += 1
+
+    if flag == 1:
+        print('legal')
+    else:
+        print('illegal')

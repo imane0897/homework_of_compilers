@@ -1,145 +1,159 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <time.h>
+#include <string.h>
 
-typedef int STATUS;
-typedef char CONDITION;
+#define STATES	256
+#define SYMBOLS	20
 
-typedef struct trans {
-    STATUS origin;
-    CONDITION condition;
-    STATUS des;
-} trans;
+int N_symbols;
+int NFA_states;
+char *NFAtab[STATES][SYMBOLS];
 
-int n;          // number of status
-int m;          // number of conditions
-int k;          // number of acc
-STATUS start;
-STATUS *acc;
+int DFA_states;	/* number of DFA states */
+int DFAtab[STATES][SYMBOLS];
 
-trans *read(FILE *src) {
-    if (!src) return NULL;  // file read error
-    trans *d = NULL;
-    int dataset_size = 0;
+/*Print state-transition table.*/
+void put_dfa_table(
+                   int tab[][SYMBOLS],	/* DFA table */
+                   int nstates,	/* number of states */
+                   int nsymbols)	/* number of input symbols */
+{
+    int i, j;
 
-    fscanf(src, "%d %d", &n, &m);
-    for (int i = 0; i < m; i++) {
-        if (dataset_size == i) {
-            d = (trans *)realloc(d, m * sizeof(trans));
-            if (!d) {
-                fprintf(stderr, "memory allocation failed\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-        // get data
-        trans *current = d + i;
-        fscanf(src,"%d%c%d", &current->origin, &current->condition, &current->des);
-    }
+    puts("STATE TRANSITION TABLE");
 
-    fscanf(src, "%d", &k);
-    acc = (STATUS *)realloc(acc, k*sizeof(STATUS));
-    for (int j = 0; j < k; j++) {
-        fscanf(src, "%d", acc+j);
-    }
-    return d;
-}
+    /* input symbols: '0', '1', ... */
+    printf("     | ");
+    for (i = 0; i < nsymbols; i++) printf("  %c  ", '0'+i);
 
-void trans_status(trans *d, STATUS origin, STATUS des) {
-    for (int i = 0; i < m; i++) {
-        if (d[i].origin == des) {
-            d[i].origin = origin;
-        } else if (d[i].des == des) {
-            d[i].des = origin;
-        }
-    }
-    for (int i = 0; i < k; i++) {
-        if (acc[i] == des) {
-            acc[i] = origin;
-        }
+    printf("\n-----+--");
+    for (i = 0; i < nsymbols; i++) printf("-----");
+    printf("\n");
+
+    for (i = 0; i < nstates; i++) {
+        printf("  %c  | ", 'A'+i);	/* state */
+        for (j = 0; j < nsymbols; j++)
+            printf("  %c  ", 'A'+tab[i][j]);
+        printf("\n");
     }
 }
 
-int cmp(const void *a, const void *b) {
-    trans *aa = (trans *)a;
-    trans *bb = (trans *)b;
-    if(aa->origin == bb->origin) {
-        if (aa->condition == bb->condition) {
-            return aa->des > bb->des ? 1: -1;
-        }
-        return aa->condition > bb->condition ? 1: -1;
-    }
-    return aa->origin > bb->origin ? 1: -1;
+/*Initialize NFA table.*/
+void init_NFA_table()
+{
+    /*
+    NFAtab[0][0] = "12";
+    NFAtab[0][1] = "13";
+    NFAtab[1][0] = "12";
+    NFAtab[1][1] = "13";
+    NFAtab[2][0] = "4";
+    NFAtab[2][1] = "";
+    NFAtab[3][0] = "";
+    NFAtab[3][1] = "4";
+    NFAtab[4][0] = "4";
+    NFAtab[4][1] = "4";
+
+    NFA_states = 5;
+    DFA_states = 0;
+    N_symbols = 2;*/
+    NFAtab[0][0] = "12";
+    NFAtab[0][1] = "";
+    NFAtab[0][2] = "";
+    NFAtab[1][0] = "1";
+    NFAtab[1][1] = "3";
+    NFAtab[1][2] = "";
+    NFAtab[2][0] = "";
+    NFAtab[2][1] = "";
+    NFAtab[2][2] = "23";
+    NFAtab[3][0] = "";
+    NFAtab[3][1] = "";
+    NFAtab[3][2] = "";
+
+    NFA_states = 4;
+    DFA_states = 0;
+    N_symbols = 3;
 }
 
-void determine(trans *d) {
-    int count = 0;
-    for (int i = 0; i < m; i++) {
-        if (d[i].condition == '#') {
-            trans_status(d, d[i].origin, d[i].des);
-            count++;
-        }
-    }
+/*String 't' is merged into 's' in an alphabetical order.*/
+void string_merge(char *s, char *t)
+{
+    char temp[STATES], *r=temp, *p=s;
 
-    qsort(d, m, sizeof(d[0]), cmp);
-    for (int i = 0; i < m; i++) {
-        for (int j = i + 1; j < m; j++) {
-            if (d[i].origin == d[j].origin) {
-                if (d[i].condition == d[j].condition) {
-                    trans_status(d, d[i].des, d[j].des);
-                }
-            } else {
-                break;
-            }
-        }
+    while (*p && *t) {
+        if (*p == *t) {
+            *r++ = *p++; t++;
+        } else if (*p < *t) {
+            *r++ = *p++;
+        } else
+            *r++ = *t++;
     }
+    *r = '\0';
+
+    if (*p) strcat(r, p);
+    else if (*t) strcat(r, t);
+
+    strcpy(s, temp);
 }
 
-int isNFA(trans *d) {
+/*Get next-state string for current-state string.*/
+void get_next_state(char *nextstates, char *cur_states,
+                    char *nfa[STATES][SYMBOLS], int n_nfa, int symbol)
+{
+    int i;
+    char temp[STATES];
 
-    qsort(d, m, sizeof(d[0]), cmp);
-    for (int i = 0; i < m; i++) {
-        if (d[i].condition == '#') {
-            return 1;
-        }
-        for (int j = i + 1; j < m; j++) {
-            if (d[i].origin == d[j].origin) {
-                if (d[i].condition == d[j].condition) {
-                    return 1;
-                }
-            }
-        }
-    }
-    return 0;
+    temp[0] = '\0';
+    for (i = 0; i < strlen(cur_states); i++)
+        string_merge(temp, nfa[cur_states[i]-'0'][symbol]);
+    strcpy(nextstates, temp);
 }
 
-bool isAcc(STATUS statu) {
-    for (int i = 0; i < k; i++) {
-        if (acc[i] == statu) {
-            return true;
+
+int state_index(char *state, char statename[][STATES], int *pn)
+{
+    int i;
+
+    if (!*state) return -1;	/* no next state */
+
+    for (i = 0; i < *pn; i++)
+        if (!strcmp(state, statename[i])) return i;
+
+    strcpy(statename[i], state);	/* new state-name */
+    return (*pn)++;
+}
+
+/*
+	Convert NFA table to DFA table.
+	Return value: number of DFA states.
+ */
+int nfa_to_dfa(char *nfa[STATES][SYMBOLS], int n_nfa,
+               int n_sym, int dfa[][SYMBOLS])
+{
+    char statename[STATES][STATES];
+    int i = 0;	/* current index of DFA */
+    int n = 1;	/* number of DFA states */
+
+    char nextstate[STATES];
+    int j;
+
+    strcpy(statename[0], "0");	/* start state */
+
+    for (i = 0; i < n; i++) {	/* for each DFA state */
+        for (j = 0; j < n_sym; j++) {	/* for each input symbol */
+
+            nextstate[0] = '\0';
+            for (int k = 0; k < strlen(statename[i]); k++)
+                string_merge(nextstate, nfa[statename[i][k]-'0'][j]);
+
+            dfa[i][j] = state_index(nextstate, statename, &n);
         }
     }
-    return false;
+
+    return n;	/* number of DFA states */
 }
 
-void minimize(trans *d) {
-
-}
-
-int main(void) {
-    FILE *automaton;
-    automaton = fopen("./automaton", "r");
-
-    trans *d = read(automaton);
-
-    if (isNFA(d)) {
-        determine(d);
-    }
-
-    minimize(d);
-    for (int i = 0; i < m; i++) {
-        printf("%d %c %d\n", d[i].origin, d[i].condition, d[i].des);
-    }
-    return 0;
+int main()
+{
+    init_NFA_table();
+    DFA_states = nfa_to_dfa(NFAtab, NFA_states, N_symbols, DFAtab);
+    put_dfa_table(DFAtab, DFA_states, N_symbols);
 }

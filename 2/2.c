@@ -5,25 +5,23 @@
 #define SYMBOLS	20
 
 int N_symbols;
-int N_NFA_states;
+int NFA_states;
 char *NFAtab[STATES][SYMBOLS];
 
-int N_DFA_states;
+int DFA_states;	/* number of DFA states */
 int DFAtab[STATES][SYMBOLS];
-char *DFA_finals;
 
-char StateName[STATES][STATES+1];
-
-int N_optDFA_states;
-int OptDFA[STATES][SYMBOLS];
-char NEW_finals[STATES+1];
-
-void print_table(
-                   int tab[][SYMBOLS],
-                   int nstates,
-                   int nsymbols) {
+/*Print state-transition table.*/
+void put_dfa_table(
+                   int tab[][SYMBOLS],	/* DFA table */
+                   int nstates,	/* number of states */
+                   int nsymbols)	/* number of input symbols */
+{
     int i, j;
 
+    puts("STATE TRANSITION TABLE");
+
+    /* input symbols: '0', '1', ... */
     printf("     | ");
     for (i = 0; i < nsymbols; i++) printf("  %c  ", '0'+i);
 
@@ -34,12 +32,29 @@ void print_table(
     for (i = 0; i < nstates; i++) {
         printf("  %c  | ", 'A'+i);	/* state */
         for (j = 0; j < nsymbols; j++)
-            printf("  %c  ", tab[i][j]);
+            printf("  %c  ", 'A'+tab[i][j]);
         printf("\n");
     }
 }
 
-void init_NFA_table() {
+<<<<<<< HEAD
+// 将字符ch插入到字符串结尾
+void chr_append(char *s, char ch) {
+    int n=strlen(s);
+
+    *(s+n) = ch;
+    *(s+n+1) = '\0';
+}
+
+void init_table() {
+    // chr_append(NFAtab[0][0], '1');
+    // chr_append(NFAtab[0][0], '2');
+=======
+/*Initialize NFA table.*/
+void init_NFA_table()
+{
+    /*
+>>>>>>> parent of c835f89... DFA+NFA
     NFAtab[0][0] = "12";
     NFAtab[0][1] = "13";
     NFAtab[1][0] = "12";
@@ -51,15 +66,35 @@ void init_NFA_table() {
     NFAtab[4][0] = "4";
     NFAtab[4][1] = "4";
 
-    N_NFA_states = 5;
-    N_DFA_states = 0;
-    N_symbols = 2;
-    DFA_finals = "E";
+    NFA_states = 5;
+    DFA_states = 0;
+    N_symbols = 2;*/
+    NFAtab[0][0] = "12";
+    NFAtab[0][1] = "";
+    NFAtab[0][2] = "";
+    NFAtab[1][0] = "1";
+    NFAtab[1][1] = "3";
+    NFAtab[1][2] = "";
+    NFAtab[2][0] = "";
+    NFAtab[2][1] = "";
+    NFAtab[2][2] = "23";
+    NFAtab[3][0] = "";
+    NFAtab[3][1] = "";
+    NFAtab[3][2] = "";
+
+    NFA_states = 4;
+    DFA_states = 0;
+    N_symbols = 3;
 }
 
+<<<<<<< HEAD
 // 将字符串 t 按照字典序合并到字符串 s
+void string_merge(char *s, char *t) {
+=======
+/*String 't' is merged into 's' in an alphabetical order.*/
 void string_merge(char *s, char *t)
 {
+>>>>>>> parent of c835f89... DFA+NFA
     char temp[STATES], *r=temp, *p=s;
 
     while (*p && *t) {
@@ -78,19 +113,22 @@ void string_merge(char *s, char *t)
     strcpy(s, temp);
 }
 
-// 找到当前 NFA 状态可到达的全部状态
-void get_next_nfa_state(char *nextstates, char *cur_states,
-                    char *nfa[STATES][SYMBOLS], int symbol) {
+/*Get next-state string for current-state string.*/
+void get_next_state(char *nextstates, char *cur_states,
+                    char *nfa[STATES][SYMBOLS], int n_nfa, int symbol)
+{
+    int i;
     char temp[STATES];
 
     temp[0] = '\0';
-    for (int i = 0; i < strlen(cur_states); i++)
+    for (i = 0; i < strlen(cur_states); i++)
         string_merge(temp, nfa[cur_states[i]-'0'][symbol]);
     strcpy(nextstates, temp);
 }
 
 
-int nfa_state_index(char *state, char statename[][STATES], int *pn) {
+int state_index(char *state, char statename[][STATES], int *pn)
+{
     int i;
 
     if (!*state) return -1;	/* no next state */
@@ -102,133 +140,37 @@ int nfa_state_index(char *state, char statename[][STATES], int *pn) {
     return (*pn)++;
 }
 
-// NFA 转 DFA。返回值为 DFA 的状态个数
-int nfa_to_dfa(char *nfa[STATES][SYMBOLS], int n_sym, int dfa[][SYMBOLS])
+/*
+	Convert NFA table to DFA table.
+	Return value: number of DFA states.
+ */
+int nfa_to_dfa(char *nfa[STATES][SYMBOLS], int n_nfa,
+               int n_sym, int dfa[][SYMBOLS])
 {
     char statename[STATES][STATES];
-    int i = 0;	// 当前 DFA 状态
-    int n = 1;	// DFA 状态个数
+    int i = 0;	/* current index of DFA */
+    int n = 1;	/* number of DFA states */
 
     char nextstate[STATES];
     int j;
 
-    strcpy(statename[0], "0");
+    strcpy(statename[0], "0");	/* start state */
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n_sym; j++) {
-            get_next_nfa_state(nextstate, statename[i], nfa, j);
-            dfa[i][j] = nfa_state_index(nextstate, statename, &n) + 'A';
+    for (i = 0; i < n; i++) {	/* for each DFA state */
+        for (j = 0; j < n_sym; j++) {	/* for each input symbol */
+
+            nextstate[0] = '\0';
+            for (int k = 0; k < strlen(statename[i]); k++)
+                string_merge(nextstate, nfa[statename[i][k]-'0'][j]);
+
+            dfa[i][j] = state_index(nextstate, statename, &n);
         }
     }
 
-    return n;
+    return n;	/* number of DFA states */
 }
 
-// 找到当前 DFA 状态可到达的全部状态
-void get_next_dfa_state(char *nextstates, char *cur_states,
-                    int dfa[STATES][SYMBOLS], int symbol) {
-
-    for (int i = 0; i < strlen(cur_states); i++)
-        *nextstates++ = dfa[cur_states[i]-'A'][symbol];
-    *nextstates = '\0';
-}
-
-// 找到当前状态的等价状态集，返回值为状态集的索引号或-1
-char equiv_class_ndx(char ch, char stnt[][STATES+1], int n) {
-
-    for (int i = 0; i < n; i++)
-        if (strchr(stnt[i], ch)) return i+'0';
-    return -1;
-}
-
-// 判断nextstates是不是同一状态，是则返回该状态，否则返回0
-char is_one_nextstate(char *s)
-{
-    char equiv_class;	/* first equiv. class */
-
-    while (*s == '@') s++;
-    equiv_class = *s++;	/* index of equiv. class */
-
-    while (*s) {
-        if (*s != '@' && *s != equiv_class) return 0;
-        s++;
-    }
-
-    return equiv_class;	/* next state: char type */
-}
-
-
-// 如果下一状态集是同一状态，返回其索引号，否则建立一个新的状态集
-int dfa_state_index(char *state, char stnt[][STATES+1], int n, int *pn,
-                int cur)
-{
-    int i;
-    char state_flags[STATES+1];
-
-    if (!*state) return -1;
-
-    for (i = 0; i < strlen(state); i++)
-        state_flags[i] = equiv_class_ndx(state[i], stnt, n);
-    state_flags[i] = '\0';
-
-    printf("   %d:[%s]\t--> [%s] (%s)\n",
-           cur, stnt[cur], state, state_flags);
-
-    if ((i=is_one_nextstate(state_flags)) != 0)
-        return i-'0';
-    else {
-        strcpy(stnt[*pn], state_flags);
-        return (*pn)++;
-    }
-}
-
-// 将状态划分为 1终结状态 + 0非终结状态
-int init_equiv_class(char statename[][STATES+1], int n, char *finals) {
-    int i, j;
-
-    if (strlen(finals) == n) {
-        strcpy(statename[0], finals);
-        return 1;
-    }
-
-    strcpy(statename[1], finals);
-
-    for (i=j=0; i < n; i++) {
-        if (i == *finals-'A') {
-            finals++;
-        } else statename[0][j++] = i+'A';
-    }
-    statename[0][j] = '\0';
-
-    return 2;
-}
-
-// 根据nextstates对状态集进行划分
-int get_optimized_DFA(char stnt[][STATES+1], int n,
-                      int dfa[][SYMBOLS], int n_sym, int newdfa[][SYMBOLS]) {
-    int n2 = n;
-    int i, j;
-    char nextstate[STATES+1];
-
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n_sym; j++) {
-            get_next_dfa_state(nextstate, stnt[i], dfa, j);
-            newdfa[i][j] = dfa_state_index(nextstate, stnt, n, &n2, i)+'A';
-        }
-    }
-
-    return n2;
-}
-
-// 将字符ch插入到字符串结尾
-void chr_append(char *s, char ch)
-{
-    int n=strlen(s);
-
-    *(s+n) = ch;
-    *(s+n+1) = '\0';
-}
-
+<<<<<<< HEAD
 // 对StateName[][]进行排序
 void stnt_sort(char stnt[][STATES+1], int n) {
     int i, j;
@@ -345,11 +287,32 @@ void get_NEW_finals(
         if (is_subset(oldfinals, stnt[i])) *newfinals++ = i+'A';
     *newfinals++ = '\0';
 }
+/*
+int isNFA() {
 
+    qsort(d, m, sizeof(d[0]), cmp);
+    for (int i = 0; i < m; i++) {
+        if (d[i].condition == '#') {
+            return 1;
+        }
+        for (int j = i + 1; j < m; j++) {
+            if (d[i].origin == d[j].origin) {
+                if (d[i].condition == d[j].condition) {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+*/
 int main() {
-    init_NFA_table();
-    N_DFA_states = nfa_to_dfa(NFAtab, N_symbols, DFAtab);
-    print_table(DFAtab, N_DFA_states, N_symbols);
+    init_table();
+
+    // if (isNFA()) {
+        N_DFA_states = nfa_to_dfa(NFAtab, N_symbols, DFAtab);
+        print_table(DFAtab, N_DFA_states, N_symbols);
+    // }
 
     N_optDFA_states = optimize_DFA(DFAtab, N_DFA_states,
                                    N_symbols, DFA_finals, StateName, OptDFA);
@@ -359,4 +322,11 @@ int main() {
     printf("Final states = %s\n", NEW_finals);
 
     return 0;
+=======
+int main()
+{
+    init_NFA_table();
+    DFA_states = nfa_to_dfa(NFAtab, NFA_states, N_symbols, DFAtab);
+    put_dfa_table(DFAtab, DFA_states, N_symbols);
+>>>>>>> parent of c835f89... DFA+NFA
 }

@@ -30,17 +30,4 @@ def set_select(ll_g):
 
     return select
 
-def get_parser(rules):
-    '''rules is the string that contains all grammar rules'''
-    g = gramtools.get_grammar(rules)
-    par = ll_parser.parser(g)
-    par.set_table(set_select(g))
-    return par
 
-
-def get_input(scanner, text):
-    '''
-    puts input in acceptable form for the parser
-    '''
-    tokens, remainder = scanner.scan(text)
-    return tokens

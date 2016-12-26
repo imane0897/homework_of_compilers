@@ -1,4 +1,4 @@
-import gramtools
+import init_grammar
 
 class parser:
     

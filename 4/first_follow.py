@@ -1,24 +1,21 @@
-# from gramtools import *
-
 def set_ll_first(g):
-        '''Sets the ll_first set for the ll_grammer'''
-        g.ll_first = {}
-        for n_terms in g.variables:
-            g.ll_first[n_terms] = {}
-            for prod in g.productions[n_terms]:
-                g.ll_first[n_terms][prod],_ = first_set_exp(g, prod, g.first)
+    '''
+    Defines the first_set for every terminal variables
+    :param g: Grammar instance
+    :return:
+    '''
+    g.ll_first = {}
+    for n_terms in g.variables:
+        g.ll_first[n_terms] = {}
+        for prod in g.productions[n_terms]:
+            g.ll_first[n_terms][prod],_ = first_set_exp(g, prod, g.first)
 
 
 def first_set_elem(G):
     '''
-    Defines the first set for every non terminal and terminal
-    returns {S: [...], A : [...], B : [...]}
-
-    Algorithm:
-    For every terminal in the grammar G, add it to firsts, key and value as terminal itself
-    Then for every non terminal in G, add its first set to the dict firsts.
-    do this by calling first_r(.,.,non terminal) which adds the n_term's first set to dict
-    remove duplicates in the first set of every n_term
+    Defines the first_set for every non-terminal variables and terminal variables
+    :param G: Grammar instance
+    :return: {S: [...], A : [...], B : [...]}
     '''
     firsts = {}
 

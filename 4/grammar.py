@@ -1,14 +1,12 @@
-# import gramtools
-
 class Grammar():
 
     def __init__(self, V=None, T=None, S=None, P=None):
         '''
         self : Grammar Object G
-        V    : G.variables, list of non terminal symbols held as strings
-        T    : G.terminals, list of terminal symbols held as strings
-        S    : G.startSymbol, symbol which is a start symbol, stored as string
-        P    : G.productions, dict of lists of production rules for the given Grammar
+        V    : G.variables, strings in list
+        T    : G.terminals, strings in list
+        S    : G.startSymbol, string
+        P    : G.productions, dict of lists
         '''
         if V:
             self.variables = V
@@ -29,6 +27,7 @@ class Grammar():
             self.productions = P
         else:
             self.productions = {}
+
         self.first = {}
         self.follow = {}
         self.ll_first = {}

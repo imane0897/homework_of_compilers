@@ -1,11 +1,16 @@
-from ll_parse_tools import *
-from gramtools import *
+from select import *
+from init_grammar import *
 
 def get_parser(rules):
-    '''rules is the string that contains all grammar rules'''
-    g = gramtools.get_grammar(rules)
+    '''
+    init Grammar(V, T, S, P), set first_set and follow_set, set select_set
+    :param rules: Grammar rules
+    :return: select_set
+    '''
+    g = get_grammar(rules)
     par = ll_parser.parser(g)
     par.set_table(set_select(g))
+
     return par
 
 

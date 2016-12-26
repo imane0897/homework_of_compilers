@@ -1,13 +1,14 @@
 # import ll_gramtools
 import ll_parser
-import gramtools
+import init_grammar
 import collections
 
 def set_select(ll_g):
     '''
     returns the ll_parsing table, given the ll_grammar as param
+    :param ll_g: LL(1) Grammar instance
+    :return: select_set
     '''
-    # table = collections.OrderedDict()
     select = {}
     prods = ll_g.ll_first
     #filling in the table with first sets
@@ -24,10 +25,6 @@ def set_select(ll_g):
                     print ("Not LL(1) Grammar")
                     #raise Exception
                 if rule != '':
-                    # pass
-                # else:
                     select[n_term][term] = rule
 
     return select
-
-

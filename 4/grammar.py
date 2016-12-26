@@ -32,13 +32,13 @@ class Grammar():
 
     def add_V(self, symbol):
         '''Add a new symbol to the set of non terminals'''
-        if symbol not in self.variables:
+        if symbol not in self.variables and symbol != '#':
             self.variables.append(str(symbol))
 
         
     def add_T(self, symbol):
         '''Add a new terminal to the current set of terminals'''
-        if symbol not in self.terminals:
+        if symbol not in self.terminals and symbol != '#':
             self.terminals.append(str(symbol))
 
 

@@ -1,7 +1,7 @@
 #############################
 #This is the gramtools library
 #Helps to work with the Grammar class, like find first/follow set, parse input to create Grammar objects
-#This library is not intended to be a tool-set FOR the Grammar class, 
+#This library is not intended to be a tool-set FOR the Grammar class,
 #rather a tool to help USE the Grammar class
 #############################
 import collections
@@ -11,7 +11,7 @@ def first_set_elem(G):
     '''
     Defines the first set for every non terminal and terminal
     returns {S: [...], A : [...], B : [...]}
-    
+
     Algorithm:
     For every terminal in the grammar G, add it to firsts, key and value as terminal itself
     Then for every non terminal in G, add its first set to the dict firsts.
@@ -19,7 +19,7 @@ def first_set_elem(G):
     remove duplicates in the first set of every n_term
     '''
     firsts = {}
-    
+
     def first_r(firsts, n_term):
         '''
         when called adds the first set of the n_term to the dict firsts
@@ -76,8 +76,9 @@ def first_set_exp(G, s, firsts):
     flag = False
     tup = []
     for i in elems:
-        if elems != '#':
-            tup.extend(firsts[i])
+        if i == '#':
+            break
+        tup.extend(firsts[i])
         if i in G.terminals or '' not in G.productions[i]:
             break
     if '#' in tup:
@@ -86,15 +87,15 @@ def first_set_exp(G, s, firsts):
     return tup, flag
 
 
-def follow_set(fr, G):
+def follow_set(G):
     '''
-    Takes in Grammar as paramater 
+    Takes in Grammar as paramater
     returns the follow  set for each non terminal in G.variables
     '''
     follows = {}
     # follows = collections.OrderedDict()
     #this is the dict which will contain the mappings for n_term to the corresponding follow set (viz a list)
-    firsts = fr
+    firsts = first_set_elem(G)
     #dict of first set
     g_prods = G.productions
     #production rules of the grammar
@@ -107,7 +108,7 @@ def follow_set(fr, G):
         #if n_term in follows.keys():#problem
             #return None
             #if n_term already exists in follows, nothing to update. end function.
-        
+
         follows[n_term] = []
         #n_term does not exist in follows, create an entry for it and populate it.
         if n_term == G.start:
@@ -130,10 +131,10 @@ def follow_set(fr, G):
                         if lhs not in follows.keys():
                             follow_r(G, lhs, follows)
                         follows[n_term].extend(follows[lhs])
-                        #then the follow of lhs is subset of follow of n_term, 
+                        #then the follow of lhs is subset of follow of n_term,
                         #before this we updated follows with follow set of lhs
                     else:
-                        #lhs has occured somewhere in between the production 
+                        #lhs has occured somewhere in between the production
                         s = " ".join(symbols[pos+1:])
                         #get the part of the production which occurs after n_term
                         f, flag = first_set_exp(G, s, firsts)
@@ -161,16 +162,16 @@ def follow_set(fr, G):
     return follows
 
 
-def get_grammar(string):
+def init_grammar(string):
     '''
     function takes in lines of the grammar rules as input
-    returns a Grammar instance initialized with as per given grammar rules. 
+    returns a Grammar instance initialized with as per given grammar rules.
     '''
     G = Grammar()
     string = string.split('\n')
     #This loop reads every line for rules
     for line in string:
-        line = line.split(" ::= ")
+        line = line.split(" : ")
         #n_term is non terminal symbol for the rule in particular line
         n_term = line[0]
         #add the non terminal to the set of non-terminals in G
@@ -184,38 +185,48 @@ def get_grammar(string):
             #add the production to the grammar
             G.add_P(n_term, p)
             p = p.split(" ")
-                
+
             for t in p:
             #for every term in the production
             #if term is not a non termianl, add it to the set of terminals for G
                 if t not in G.variables and t != '#':
                     G.add_T(t)
-                    
-            #above does not ensure that all added term is not a non terminal, 
+
+            #above does not ensure that all added term is not a non terminal,
             #so this func below will ensure correctness
         for i in G.variables:
             if i in G.terminals:
                 G.terminals.remove(i)
         G.start = G.variables[0]
+
+    # fr = first_set_elem(g)
+    # g.set_first(fr)
+    #
+    # fl = follow_set(g)
+    # g.set_follow(fl)
+
     return G
 
 
-if __name__ == '__main__':
-    g = \
-'''E ::= T E’
-E’ ::= + T E’ | #
-T ::= F T’
-T’ ::= * F T’ | #
-F ::= ( E ) | i'''
+def set_ll_first(g):
+        '''Sets the ll_first set for the ll_grammer'''
+        g.ll_first = {}
+        for n_terms in g.variables:
+            g.ll_first[n_terms] = {}
+            for prod in g.productions[n_terms]:
+                g.ll_first[n_terms][prod],_ = first_set_exp(g, prod, g.first)
 
-    g = get_grammar(g)
-    print(g)
+
+def get_grammar(string):
+
+    g = init_grammar(string)
+
     fr = first_set_elem(g)
-    print('')
-    print ("First set : ")
-    print (fr)
-    print ('')
-    fl = follow_set(fr, g)
-    print ("Follow Set : ")
-    print (fl)
-    
+    g.set_first(fr)
+
+    fl = follow_set(g)
+    g.set_follow(fl)
+
+    set_ll_first(g)
+
+    return g

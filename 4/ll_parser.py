@@ -1,4 +1,4 @@
-import ll_gramtools
+import gramtools
 
 class parser:
     
@@ -37,18 +37,15 @@ class parser:
                 p = table[tos].get(next, None)
                 if p == None:
                     return False
-                if p != '':
+                elif '#' in p:
+                    pass
+                elif p != '':
                     stack.extend(p.split(" ")[::-1])
+            elif next == tos:
+                if input:
+                    next = input.pop(0)
             else:
-                if next == tos:
-                    if input:
-                        next = input.pop(0)
-
-                else:
-                    print ("String does not belong to the Grammar")
-                    return False
+                print ("String does not belong to the Grammar")
+                return False
 
         return True
-
-
-

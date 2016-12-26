@@ -1,3 +1,5 @@
+# import gramtools
+
 class Grammar():
 
     def __init__(self, V=None, T=None, S=None, P=None):
@@ -27,7 +29,9 @@ class Grammar():
             self.productions = P
         else:
             self.productions = {}
-
+        self.first = {}
+        self.follow = {}
+        self.ll_first = {}
 
 
     def add_V(self, symbol):
@@ -54,21 +58,25 @@ class Grammar():
         '''set the start symbol for the grammar'''
         self.start = symbol
 
+
+    def set_first(self, f_set):
+        '''Sets the first set for the ll_grammar'''
+        self.first = f_set
+
+
+    def set_follow(self, f_set):
+        '''Sets the follow set for the ll_grammar'''
+        self.follow = f_set
+
+
     def __str__(self):
         '''Prints out G(V, T, S, P)'''
         s = 'Grammar \n'
-        s = s + 'Start Symbol \n' + str(self.start) + '\n'
-        s = s + 'Terminals \n' + str(self.terminals) + '\n'
-        s = s + 'Variables \n' + str(self.variables) + '\n'
-        s = s + 'Productions \n' + str(self.productions) + '\n'
+        s += 'Start Symbol \n' + str(self.start) + '\n'
+        s += 'Terminals \n' + str(self.terminals) + '\n'
+        s += 'Variables \n' + str(self.variables) + '\n'
+        s += 'Productions \n' + str(self.productions) + '\n'
+        s += '\nFirst set :\n' + str(self.first) + '\n'
+        s += '\nFollow set :\n' + str(self.follow) + '\n'
+        s += '\nLL_First set :\n' + str(self.ll_first) + '\n'
         return s
-
-'''
-Example grammar:
-make sure all spacing is appropriate
-******
-S : E + E | E - E | T
-E : T * T | T / T | T
-T : int | ( S )
-******
-'''

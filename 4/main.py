@@ -14,8 +14,8 @@ def get_parser(rules):
     '''
     g = get_grammar(rules)
     par = parser(g)
-    select = get_select(g)
-    par.set_table(select)
+    select_set = get_select(g)
+    par.set_table(select_set)
 
     return par
 
@@ -32,10 +32,14 @@ F : ( E ) | i'''
     with open('/Users/AnYameng/Desktop/c/homework_of_compilers/4/4_1.txt', 'r') as f:
         l = f.readlines()
         for input in l:
+            str = input
             input = input.strip().split(" ")
             result = p.parse(input)
-
             if result:
-                print('legal')
+                # print(input)
+                print(str.strip() + '\n\t\t\tis legal')
             else:
-                print('illegal')
+                # str = input + 'illegal'
+                # print(str)
+                # print(input)
+                print(str.strip() + '\n\t\t\tis illegal')

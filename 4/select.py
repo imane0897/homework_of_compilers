@@ -31,14 +31,22 @@ def print_select(select):
     s = 'Select \n'
     for i in select:
         s += '\t\t\t' + str(i) + ' : '
-        for j in select(str(i))[:-1]:
-            s += str(j) + ' | '
-        s += str(select[str(i)][-1])
+        t = []
+        for j in select[str(i)]:
+            t.append(j)
+        for j in t[-1]:
+            s += j + ' | '
+        s += t[-1]
         s += '\n'
     s += '\n'
 
 
 def get_select(g):
+    '''
+    get select_set use given grammar and print it out
+    :param g: grammar instance
+    :return: select_set
+    '''
     select = set_select(g)
     print_select(select)
     return select

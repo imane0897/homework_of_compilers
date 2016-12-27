@@ -70,6 +70,10 @@ def first_set_exp(G, s, firsts):
     '''
     This function takes in Grammar and a string (RHS of a production) as its paramaters
     returns a list of first set for the particular RHS
+    :param G: Grammar
+    :param s: string (RHS of a production)
+    :param firsts:
+    :return: a list of first set for the particular RHS & flag indicates wheather alpha->#
     '''
     elems = s.split(" ")
     flag = False
@@ -88,8 +92,8 @@ def first_set_exp(G, s, firsts):
 
 def follow_set(G):
     '''
-    Takes in Grammar as paramater
-    returns the follow  set for each non terminal in G.variables
+    :param G: Grammar
+    :return: follow set for each non terminal in G.variables
     '''
     follows = {}
     # follows = collections.OrderedDict()
@@ -101,8 +105,6 @@ def follow_set(G):
     def follow_r(G, n_term, follows):
         '''
         This is the recursive follow set function, pass the Grammar G, non terminal n_term (string) and  the follows set (dict) of the grammar
-        if the follow set is already present in the follows dict, then this will just return
-        else it will recursively find all the elements in the follow set for the given n_term, and updates follows
         '''
         #if n_term in follows.keys():#problem
             #return None

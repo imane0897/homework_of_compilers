@@ -1,7 +1,4 @@
-# import ll_gramtools
-import ll_parser
-import init_grammar
-import collections
+from ll_parser import *
 
 def set_select(ll_g):
     '''
@@ -27,4 +24,21 @@ def set_select(ll_g):
                 if rule != '':
                     select[n_term][term] = rule
 
+    return select
+
+
+def print_select(select):
+    s = 'Select \n'
+    for i in select:
+        s += '\t\t\t' + str(i) + ' : '
+        for j in select(str(i))[:-1]:
+            s += str(j) + ' | '
+        s += str(select[str(i)][-1])
+        s += '\n'
+    s += '\n'
+
+
+def get_select(g):
+    select = set_select(g)
+    print_select(select)
     return select

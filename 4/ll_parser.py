@@ -1,7 +1,7 @@
 import init_grammar
 
 class parser:
-    
+
     def __init__(self, grammar=None, table=None):
         if table:
             self.table = table
@@ -15,8 +15,10 @@ class parser:
     def set_table(self, table):
         self.table = table
 
+
     def set_grammar(self, grammar):
         self.grammar = grammar
+
 
     def parse(self, input, verbose=False):
         self.stack = []
@@ -27,12 +29,12 @@ class parser:
         stack.append(grammar.start)
         input.append('$')
         next = input.pop(0)
-        
+
         while stack and next:
             if verbose : print (input, 'next :', next)
             tos = stack.pop()
             if verbose : print (stack, 'tos : ', tos)
-            
+
             if tos in grammar.variables:
                 p = table[tos].get(next, None)
                 if p == None:

@@ -1,5 +1,10 @@
-from select import *
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from init_grammar import *
+from select import *
+from ll_parser import *
+
 
 def get_parser(rules):
     '''
@@ -8,8 +13,9 @@ def get_parser(rules):
     :return: select_set
     '''
     g = get_grammar(rules)
-    par = ll_parser.parser(g)
-    par.set_table(set_select(g))
+    par = parser(g)
+    select = get_select(g)
+    par.set_table(select)
 
     return par
 

@@ -2,14 +2,11 @@ class Grammar():
 
     def __init__(self, V=None, T=None, S=None, P=None):
         '''
-        self     : Grammar Object G
-        V        : G.variables, strings in list
-        T        : G.terminals, strings in list
-        S        : G.startSymbol, string
-        P        : G.productions, dict of lists
-        first    : G.first_set, dict of lists (include V first and T first)
-        follow   : G.follow_set, dict of lists
-        ll_first : G.ll_first_set, dict of lists (include V first only)
+        self : Grammar Object G
+        V    : G.variables, strings in list
+        T    : G.terminals, strings in list
+        S    : G.startSymbol, string
+        P    : G.productions, dict of lists
         '''
         if V:
             self.variables = V
@@ -30,10 +27,6 @@ class Grammar():
             self.productions = P
         else:
             self.productions = {}
-
-        self.first = {}
-        self.follow = {}
-        self.ll_first = {}
 
 
     def add_V(self, symbol):
@@ -61,21 +54,18 @@ class Grammar():
         self.start = symbol
 
 
-    def set_first(self, f_set):
-        '''Sets the first set for the ll_grammar'''
-        self.first = f_set
-
-
-    def set_follow(self, f_set):
-        '''Sets the follow set for the ll_grammar'''
-        self.follow = f_set
-
-
     def __str__(self):
-        '''Prints out G(V, T, S, P, First_set, Follow_set)'''
+        '''Prints out G(V, T, S, P)'''
         s = '_____________________Grammar_____________________\n\n'
         s += 'Start Symbol \n' + '\t\t\t'+str(self.start) + '\n'
         s += 'Terminals \n' + '\t\t\t'+str(self.terminals) + '\n'
         s += 'Variables \n' + '\t\t\t'+str(self.variables) + '\n'
+        s += 'Productions \n' + '\n'
+        for p in self.productions:
+            s += '\t\t\t' + str(p) + ' ::= '
+            for i in self.productions[str(p)][:-1]:
+                s += str(i) + ' | '
+            s += str(self.productions[str(p)][-1])
+            s += '\n'
         s += '________________________________________________\n\n'
         return s

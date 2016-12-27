@@ -1,6 +1,6 @@
 from grammar import Grammar
 from first_follow import *
-
+from pre_disposal import *
 
 
 def init_grammar(string):
@@ -40,10 +40,8 @@ def init_grammar(string):
                 G.terminals.remove(i)
         G.start = G.variables[0]
 
+    # G.productions = left_disposal(G.productions)
     return G
-
-
-
 
 
 def get_grammar(string):
@@ -53,7 +51,7 @@ def get_grammar(string):
     :return: Grammar instance (V, T, S, P, first_set, follow_set)
     '''
     g = init_grammar(string)
-
+    print(g)
     fr = first_set_elem(g)
     g.set_first(fr)
 
@@ -64,3 +62,13 @@ def get_grammar(string):
 
     print(g)
     return g
+
+
+if __name__ == '__main__':
+    g = \
+'''E : TE'
+E': + T E' | #
+T : F T'
+T' : * F T' | #
+F : ( E ) | i'''
+    p = get_grammar(g)

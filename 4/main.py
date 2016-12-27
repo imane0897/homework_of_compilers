@@ -16,10 +16,8 @@ def get_parser(rules):
 
 if __name__ == '__main__':
     g = \
-'''E : T E’
-E’ : + T E’ | #
-T : F T’
-T’ : * F T’ | #
+'''E : E + T | T
+T : T * F | F
 F : ( E ) | i'''
     p = get_parser(g)
 

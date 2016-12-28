@@ -56,16 +56,23 @@ class Grammar():
 
     def __str__(self):
         '''Prints out G(V, T, S, P)'''
-        s = '_____________________Grammar_____________________\n\n'
-        s += 'Start Symbol \n' + '\t\t\t'+str(self.start) + '\n'
-        s += 'Terminals \n' + '\t\t\t'+str(self.terminals) + '\n'
-        s += 'Variables \n' + '\t\t\t'+str(self.variables) + '\n'
-        s += 'Productions \n' + '\n'
-        for p in self.productions:
-            s += '\t\t\t' + str(p) + ' ::= '
-            for i in self.productions[str(p)][:-1]:
-                s += str(i) + ' | '
-            s += str(self.productions[str(p)][-1])
-            s += '\n'
-        s += '________________________________________________\n\n'
+        s = '''
+_____________________Grammar_____________________
+
+
+Start Symbol
+\t\t\t{}
+
+Terminals
+\t\t\t{}
+
+Variables
+\t\t\t{}
+
+Productions
+\t\t\t{}
+________________________________________________
+
+'''.format(self.start, self.terminals, self.variables, self.productions)
+
         return s

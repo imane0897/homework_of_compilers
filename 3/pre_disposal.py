@@ -1,13 +1,13 @@
 def left_disposal(dic):
     '''
-    先用代入法消除间接左递归, 再消除直接左递归
+    disposal left recursion
     :param dic:
     :return:
     '''
     dic_list = list(dic.keys())
     for i, form_left in enumerate(dic_list):
 
-        # 代入消除间接左递归
+        # not_direct left recursion
         for j in dic_list[:i]:
             for index, form_right in enumerate(dic[str(form_left)]):
                 if form_right[0] == str(j):
@@ -17,7 +17,7 @@ def left_disposal(dic):
                 else:
                     pass
 
-        # 消除直接左递归
+        # direct left recursion
         flag = 0
         for i, form_right in enumerate(dic[str(form_left)]):
             if form_right[0] == str(form_left)[0]:

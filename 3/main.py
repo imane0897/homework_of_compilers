@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import collections
-from init_grammar import *
+from pre_disposal import *
 
 global symbol
 global sym
@@ -97,12 +97,17 @@ def _T():
         return True
 
 if __name__=='__main__':
-    dic = collections.OrderedDict()
     g = \
 '''E : E + T | T
 T : T * F | F
 F : ( E ) | i'''
-    get_grammar(g)
+
+    dic = collections.OrderedDict()
+    left_disposal(dic)
+    # print_forms(dic)
+    print('')
+
+    # get_grammar(g)
 
     with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
         l = f2.readlines()

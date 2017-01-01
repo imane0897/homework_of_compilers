@@ -2,19 +2,20 @@
 the functions of finite automaton.
 """
 from copy import deepcopy
-from DeterministicFiniteAutomaton import DeterministicFiniteAutomaton
+from DFA import DFA
 from collections import defaultdict
 import random
+import pprint
 
 
-def distinguish(nfa):
+def isNFA(nfa):
     """
     return if the input automaton is dfa or nfa.
     """
     for state in nfa.transition.keys():
         for sigma in nfa.alphabet():
             try:
-                if nfa.transition[state]['e']:
+                if nfa.transition[state]['#']:
                     print("it is a nfa")
                     return nfa
             except KeyError:
@@ -26,12 +27,13 @@ def distinguish(nfa):
                     return nfa
             except KeyError:
                 pass
-    dfa = DeterministicFiniteAutomaton(nfa.start_state, nfa.accept_states, nfa.transition)
+    dfa = DFA(nfa.start_state, nfa.accept_states, nfa.transition)
     print("it is dfa")
     return dfa
 
 
 def convert(nfa):
+    '''conver NFA to DFA'''
     start_state = frozenset(nfa.epsilon_closure(nfa.start_state))
     states = {start_state}
     unprocessed_states = states.copy()
@@ -58,7 +60,9 @@ def convert(nfa):
     for state in states:
         if len(state & nfa.accept_states):
             accept_states.add(state)
-    dfa = DeterministicFiniteAutomaton(start_state, accept_states, transition)
+    dfa = DFA(start_state, accept_states, transition)
+    dfa = rename(dfa)
+
     return dfa
 
 
@@ -93,7 +97,7 @@ def rename(dfa):
     for state in dfa.accept_states:
         new_accept_state = new_accept_state | frozenset(rename_dict[state])
 
-    new_dfa = DeterministicFiniteAutomaton(new_start_state, new_accept_state, new_transition)
+    new_dfa = DFA(new_start_state, new_accept_state, new_transition)
     return new_dfa
 
 
@@ -164,29 +168,29 @@ def minimization(dfa):
                         for b in a:
                             if dfa.trans(frozenset([s]), sigma) == frozenset([b]):
                                 new_transition[state][sigma] = a
-    new = DeterministicFiniteAutomaton(start_state, accept_states, new_transition)
+    new = DFA(start_state, accept_states, new_transition)
     new = rename(new)
     return new
 
 
 def print_automaton(fa):
-    # print('start_state: ', fa.start_state)
-    # print('accept_states: ', fa.accept_states)
-    # print('transition_table:')
-    # for x in fa:
-    #     print(x)
     str = '''
-    _____________________Automation_____________________
+_____________________Automation_____________________
 
 
-        Start State
+    Start State
         \t\t\t{}
 
-        Accept States
+    Accept States
         \t\t\t{}
 
-        Transition Table
-'''.format(fa.start_state, fa.accept_states)
-    for x in fa:
-        str +=  '\t\t\t\t\t' + x + '\n'
+    Transition Table
+'''.format(list(fa.start_state), list(fa.accept_states))
+    for x, y in fa:
+
+        str += '\t\t\t\t\t {}:: '.format(list(x))
+        for i, j in y.items():
+            str += "{}: {}, ".format(i, list(j))
+        str += "\n"
+
     print(str)

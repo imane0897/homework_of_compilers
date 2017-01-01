@@ -1,4 +1,5 @@
 from grammar import Grammar
+from first_follow import *
 from pre_disposal import *
 
 def init_grammar(string):
@@ -11,7 +12,7 @@ def init_grammar(string):
     string = string.split('\n')
 
     for line in string:
-        line = line.split(" :: ")
+        line = line.split(" : ")
         n_term = line[0]
 
         G.add_V(n_term)
@@ -38,7 +39,6 @@ def init_grammar(string):
                 G.terminals.remove(i)
         G.start = G.variables[0]
 
-    G.productions = left_disposal(G.productions)
     return G
 
 
@@ -50,15 +50,15 @@ def get_grammar(string):
     '''
     g = init_grammar(string)
 
-    print(g)
-    return g
+    fr = first_set_elem(g)
+    g.set_first(fr)
 
-if __name__ == '__main__':
-    g = \
-'''E :: E + T | T
-T :: T * F | F
-F :: ( E ) | i'''
-#     g = \
-# '''S :: A | b
-# A :: A c | S d'''
-    get_grammar(g)
+    fl = follow_set(g)
+    g.set_follow(fl)
+
+    set_ll_first(g)
+
+    print(g)
+    # g.productions = left_disposal(g)
+    # print(g.productions)
+    return g

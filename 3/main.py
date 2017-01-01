@@ -109,7 +109,7 @@ F : ( E ) | i'''
 
     # get_grammar(g)
 
-    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/3/3_2.txt', 'r') as f2:
+    with open('3_2.txt', 'r') as f2:
         l = f2.readlines()
 
         for test_string in l:

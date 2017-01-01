@@ -50,7 +50,6 @@ char current[1];
 char token[10];
 char *text;
 char *symbol;
-char *reserver_list[50];
 int cur_point;
 int buffer_len = 0;
 
@@ -204,6 +203,14 @@ bool isGt() {
 
 bool isLt() {
     if (text[cur_point] == '<') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool isUnderscore() {
+    if (text[cur_point] == '_') {
         return true;
     } else {
         return false;
@@ -388,9 +395,9 @@ int getsym() {
         _getchar();            // 读取字符，跳过空格、换行和Tab
     }
 
-    if (isLetter()) {
+    if (isLetter() || isUnderscore()) {
 
-        while (isLetter()) {   // 将字符拼接成字符串
+        while (isLetter() || isDigit() || isUnderscore()) {   // 将字符拼接成字符串
             catToken();
             _getchar();
         }
@@ -582,7 +589,7 @@ int getsym() {
 
 int main(void) {
     readIn();
-
+    printf("\n");
     for (cur_point =0; text[cur_point] != '\0'; cur_point++) {
         getsym();
     }

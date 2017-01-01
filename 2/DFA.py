@@ -1,16 +1,17 @@
 import functools
 
 
-class DeterministicFiniteAutomaton:
+class DFA:
     def __init__(self, start_state, accept_states, transition):
         self.start_state = start_state
         self.accept_states = accept_states
         self.transition = transition
 
+
     def __iter__(self):
         keys = self.transition.keys()
         for key in sorted(keys):
-            yield '{0} {1}'.format(key, self.transition[key])
+            yield key, self.transition[key]
 
     def trans(self, state, input_string):
         """

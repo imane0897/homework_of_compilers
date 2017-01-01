@@ -1,5 +1,5 @@
-import FiniteAutomaton
-from NondeterministicFiniteAutomaton import NondeterministicFiniteAutomaton
+import automaton
+from NFA import NFA
 from collections import defaultdict
 
 
@@ -16,29 +16,24 @@ def initial(text_path):
             states = set(alpha_value.split(','))
             alphabet[sigma] = frozenset(states)
         transition[frozenset([state])] = alphabet
-    nfa_test = NondeterministicFiniteAutomaton(start_state=frozenset(['q0']), accept_states={text[len(text)-1]}, transition=transition)
+    nfa_test = NFA(start_state=frozenset(['q0']), accept_states={text[len(text) - 1]}, transition=transition)
     return nfa_test
 
 
 if __name__ == '__main__':
-    nfa = initial('2_3.txt')
-    nfa_or_dfa = FiniteAutomaton.distinguish(nfa)
-    if nfa_or_dfa == nfa:
-        dfa = FiniteAutomaton.convert(nfa)
-        dfa = FiniteAutomaton.rename(dfa)
-        FiniteAutomaton.print_automaton(dfa)
-        mini_dfa = FiniteAutomaton.minimization(nfa_or_dfa)
-        FiniteAutomaton.print_automaton(mini_dfa)
+    nfa = initial('2_1.txt')
+    isNFA = automaton.isNFA(nfa)
 
+    if isNFA:
+        dfa = automaton.convert(nfa)
     else:
-        mini_dfa = FiniteAutomaton.minimization(nfa_or_dfa)
-        FiniteAutomaton.print_automaton(mini_dfa)
+        dfa = nfa
 
-    # print([(x, mini_dfa.is_accept(x)) for x in ['abb', 'ab', 'baababb']]) # 2_1.txt expected result:[('abb', True), ('ab', False), ('baababb', True)]
-    # print([(x, mini_dfa.is_accept(x)) for x in ['0101', '1100', '1011']]) # 2_2.txt expected result:[('0101', False), ('1100', True), ('1011', False)]
-    # print((x, mini_dfa.is_accept(x)) for x in ['aa', 'ab', 'aba'])  # 2_3.txt expected result:[('aa', False), ('ab', True), ('aba', False)]
+    mini_dfa = automaton.minimization(dfa)
+    automaton.print_automaton(mini_dfa)
 
-    test_list = ['aa', 'ab', 'aba']
+
+    test_list = ['bbaaabb', 'bab', 'abbbba', 'aaabba', 'abc']
     for x in test_list:
         print(' ')
         print((x, mini_dfa.is_accept(x)))

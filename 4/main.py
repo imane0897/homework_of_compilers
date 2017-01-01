@@ -22,15 +22,13 @@ def get_parser(rules):
 
 if __name__ == '__main__':
     g = \
-'''E : T E’
-E’ : + T E’ | #
-T : F T’
-T’ : * F T’ | #
-F : ( E ) | i'''
+'''E : E + T | T
+    T : T * F | F
+    F : ( E ) | i'''
 
     p = get_parser(g)
 
-    with open('/Users/AnYameng/Desktop/c/homework_of_compilers/4/4_1.txt', 'r') as f:
+    with open('4_1.txt', 'r') as f:
         l = f.readlines()
         for input in l:
             str = input
